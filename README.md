@@ -145,6 +145,9 @@ set -g @sessionx-fzf-builtin-tmux 'on'
 # Setting this option to 'false' changes this default behavior
 set -g @sessionx-filter-current 'false'
 
+# Sort sessions by recency (most recently attached first)
+set -g @sessionx-sort-by-recency 'on'
+
 # Window mode can be turned on so that the default layout
 # Has all the windows listed rather than sessions only
 set -g @sessionx-window-mode 'on'

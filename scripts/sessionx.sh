@@ -8,14 +8,19 @@ source "$CURRENT_DIR/tmuxinator.sh"
 source "$CURRENT_DIR/fzf-marks.sh"
 
 get_sorted_sessions() {
-	last_session=$(tmux display-message -p '#{client_last_session}')
-	sessions=$(tmux list-sessions | sed -E 's/:.*$//' | grep -Fxv "$last_session")
 	filtered_sessios=${extra_options["filtered-sessions"]}
+	if [[ "${extra_options["sort-by-recency"]}" == "on" ]]; then
+		sessions=$(tmux list-sessions -F '#{session_last_attached} #{session_name}' | sort -n | awk '{print $2}')
+	else
+		last_session=$(tmux display-message -p '#{client_last_session}')
+		sessions=$(tmux list-sessions | sed -E 's/:.*$//' | grep -Fxv "$last_session")
+		sessions=$(echo -e "$sessions\n$last_session" | awk '!seen[$0]++')
+	fi
 	if [[ -n "$filtered_sessios" ]]; then
 	  filtered_and_piped=$(echo "$filtered_sessios" | sed -E 's/,/|/g')
 	  sessions=$(echo "$sessions" | grep -Ev "$filtered_and_piped")
 	fi
-	echo -e "$sessions\n$last_session" | awk '!seen[$0]++'
+	echo "$sessions"
 }
 
 tmux_option_or_fallback() {
